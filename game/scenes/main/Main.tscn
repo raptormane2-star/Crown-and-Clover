@@ -1,0 +1,66 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/game_controller.gd" id="1_game"]
+[ext_resource type="Script" path="res://systems/item_database.gd" id="2_items"]
+[ext_resource type="Script" path="res://systems/inventory_system.gd" id="3_inventory"]
+[ext_resource type="Script" path="res://systems/day_night_system.gd" id="4_time"]
+[ext_resource type="Script" path="res://systems/villager_jobs_system.gd" id="5_villagers"]
+[ext_resource type="Script" path="res://systems/save_system.gd" id="6_save"]
+[ext_resource type="Script" path="res://systems/asset_catalog.gd" id="7_assets"]
+[ext_resource type="Script" path="res://world/world_controller.gd" id="8_world"]
+[ext_resource type="Script" path="res://characters/player.gd" id="9_player"]
+[ext_resource type="PackedScene" path="res://ui/HUD.tscn" id="10_hud"]
+
+[sub_resource type="CapsuleShape2D" id="PlayerShape"]
+radius = 14.0
+height = 34.0
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_game")
+
+[node name="Systems" type="Node" parent="."]
+
+[node name="ItemDatabase" type="Node" parent="Systems"]
+unique_name_in_owner = true
+script = ExtResource("2_items")
+
+[node name="InventorySystem" type="Node" parent="Systems"]
+unique_name_in_owner = true
+script = ExtResource("3_inventory")
+
+[node name="DayNightSystem" type="Node" parent="Systems"]
+unique_name_in_owner = true
+script = ExtResource("4_time")
+
+[node name="VillagerJobsSystem" type="Node" parent="Systems"]
+unique_name_in_owner = true
+script = ExtResource("5_villagers")
+
+[node name="SaveSystem" type="Node" parent="Systems"]
+unique_name_in_owner = true
+script = ExtResource("6_save")
+
+[node name="AssetCatalog" type="Node" parent="Systems"]
+unique_name_in_owner = true
+script = ExtResource("7_assets")
+
+[node name="World" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("8_world")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+unique_name_in_owner = true
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("9_player")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("PlayerShape")
+position = Vector2(0, 8)
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="HUD" parent="." instance=ExtResource("10_hud")]
+unique_name_in_owner = true
