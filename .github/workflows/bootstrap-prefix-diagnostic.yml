@@ -1,0 +1,57 @@
+name: Bootstrap prefix diagnostics
+
+on:
+  push:
+    branches:
+      - bootstrap/v03-import
+    paths:
+      - .bootstrap/PREFIX_DIAG
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reconstruct valid contiguous prefix
+        shell: bash
+        run: |
+          set -u
+          {
+            cat .bootstrap/chunk-000 .bootstrap/chunk-001 .bootstrap/chunk-002
+            head -c 16000 .bootstrap/chunk-003
+            cat .bootstrap/chunk-004 .bootstrap/chunk-005 .bootstrap/chunk-006
+          } > /tmp/prefix.b64
+          base64 --decode /tmp/prefix.b64 > /tmp/prefix.tar.gz
+          mkdir -p /tmp/recovered
+          set +e
+          gzip -dc /tmp/prefix.tar.gz > /tmp/prefix.tar 2>/tmp/gzip.err
+          GZIP_RC=$?
+          tar -xf /tmp/prefix.tar -C /tmp/recovered 2>/tmp/tar.err
+          TAR_RC=$?
+          set -e
+          {
+            echo 'Crown & Clover bootstrap prefix recovery'
+            echo "base64_bytes=$(wc -c < /tmp/prefix.b64 | tr -d ' ')"
+            echo "gzip_rc=$GZIP_RC"
+            echo "tar_rc=$TAR_RC"
+            echo '--- recovered files ---'
+            find /tmp/recovered -type f -printf '%P\n' | sort
+            echo '--- gzip stderr ---'
+            cat /tmp/gzip.err || true
+            echo '--- tar stderr ---'
+            cat /tmp/tar.err || true
+          } > .bootstrap/PREFIX_STATUS
+      - name: Commit prefix status
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .bootstrap/PREFIX_STATUS
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: report recoverable bootstrap prefix"
+          git push origin HEAD:bootstrap/v03-import
