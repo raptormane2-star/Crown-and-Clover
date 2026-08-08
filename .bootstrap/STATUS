@@ -1,0 +1,27 @@
+Crown & Clover bootstrap archive diagnostic
+commit=5a2c5fa172f22d4ced01f164684a5b5e85a9a43d
+
+.bootstrap/chunk-000 bytes=16000
+ head=H4sIAAAAAAAAA+w8bXPbOM79 tail=kHnxdaTf+19mmWgO5n8NYfs+
+.bootstrap/chunk-001 bytes=16000
+ head=QHxJ+e5TJJL7AS1U4l3+VFfA tail=fAq3+bXRB3P41oJ6sO50ZYAJ
+.bootstrap/chunk-002 bytes=16000
+ head=DoA8EYAVRn10aqsQADlouNgN tail=VA3ycFX8ShwIdAqkVMtpmEml
+.bootstrap/chunk-003 bytes=16001
+ head=RDGniGDx8TkDrVwFeb6YvvFi tail=FgkwxmtnRkzCa4lYhO9D6hp'
+.bootstrap/chunk-004 bytes=16000
+ head=PKZN4wBqRFbn2gGohbCMw/xB tail=xujNZ7RQW/2vFZM8lohhgSUP
+.bootstrap/chunk-005 bytes=16000
+ head=pRVE+EiY0RieqEQToGn6CFo3 tail=+vSVb39SEuUPqgBotNmYveOM
+.bootstrap/chunk-006 bytes=16000
+ head=fujZSb7vOTEutIiK9VauOfeQ tail=/dylTUR4dA/vC2aRX9v0yYZP
+.bootstrap/chunk-007 bytes=20000
+ head=/JXzm1OrkT+50Ncc+pwj1Oqg tail=q2yEnw9+43SBDDFmPhP4IZT3
+.bootstrap/chunk-008 bytes=13644
+ head=Tvo/aASL6wbKHSeD2s+mPTpR tail=xuUlRSDbLvwkSJSzMy6R+uaj
+
+combined_base64_bytes=145645
+
+combined_base64_sha256=25f79dc1408831e4432380016a220a7a6a36a2d4fc7be98d809658d1e9d59b42
+base64_decode=failed
+base64: invalid input
