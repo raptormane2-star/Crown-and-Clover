@@ -56,7 +56,7 @@ func _process(delta: float) -> void:
 
     if Input.is_action_just_pressed("save_game"):
         _save_game()
-    if Input.is_key_pressed(KEY_L):
+    if Input.is_action_just_pressed("load_game"):
         _load_game()
 
 func _handle_hotbar_input() -> void:
