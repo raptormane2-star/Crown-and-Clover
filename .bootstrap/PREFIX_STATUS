@@ -1,0 +1,25 @@
+Crown & Clover bootstrap prefix recovery
+base64_bytes=112000
+gzip_rc=1
+tar_rc=2
+--- recovered files ---
+.gitattributes
+.github/ISSUE_TEMPLATE/bug_report.md
+.github/ISSUE_TEMPLATE/feature_request.md
+.github/workflows/godot-check.yml
+assets/ruins/LICENSE_README.txt
+assets/ruins/ruin_1.png
+assets/ruins/ruin_2.png
+assets/ruins/ruin_3.png
+assets/ruins/ruin_4.png
+assets/ruins/ruin_5.png
+assets/ruins/ruin_7.png
+main.gd
+project.godot
+--- gzip stderr ---
+
+gzip: /tmp/prefix.tar.gz: unexpected end of file
+--- tar stderr ---
+tar: Unexpected EOF in archive
+tar: Unexpected EOF in archive
+tar: Error is not recoverable: exiting now
