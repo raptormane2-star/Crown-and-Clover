@@ -20,3 +20,9 @@ Thumbs.db
 # Local saves / temp
 *.tmp
 *.bak
+
+# Third-party raw art/audio: local only until redistribution rights are verified
+game/assets/**/*.png
+game/audio/*.wav
+!game/assets/ruins/LICENSE_README.txt
+!game/assets/README.md
