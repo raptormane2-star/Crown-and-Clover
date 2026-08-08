@@ -1,0 +1,130 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ui/hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StylePanel"]
+bg_color = Color(0.075, 0.055, 0.09, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.84, 0.70, 0.40, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleInventory"]
+bg_color = Color(0.05, 0.04, 0.07, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.84, 0.70, 0.40, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="TopLeft" type="PanelContainer" parent="."]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 355.0
+offset_bottom = 76.0
+theme_override_styles/panel = SubResource("StylePanel")
+
+[node name="Margin" type="MarginContainer" parent="TopLeft"]
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="VBox" type="VBoxContainer" parent="TopLeft/Margin"]
+
+[node name="RealmLabel" type="Label" parent="TopLeft/Margin/VBox"]
+unique_name_in_owner = true
+text = "Cloverhold  •  Day 1  •  08:00"
+
+[node name="ResourceLabel" type="Label" parent="TopLeft/Margin/VBox"]
+unique_name_in_owner = true
+text = "Gold 60   Wood 18   Stone 12   Food 4"
+
+[node name="StatusLabel" type="Label" parent="TopLeft/Margin/VBox"]
+unique_name_in_owner = true
+text = "HP 6/6   REP 0"
+
+[node name="Hotbar" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -224.0
+offset_top = -54.0
+offset_right = 224.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 2
+
+[node name="MessagePanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -118.0
+offset_right = 250.0
+offset_bottom = -68.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StylePanel")
+
+[node name="MessageLabel" type="Label" parent="MessagePanel"]
+unique_name_in_owner = true
+text = "Your little realm is waiting to grow."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="InventoryPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -245.0
+offset_top = -135.0
+offset_right = 245.0
+offset_bottom = 135.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleInventory")
+
+[node name="Margin" type="MarginContainer" parent="InventoryPanel"]
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="InventoryPanel/Margin"]
+
+[node name="Title" type="Label" parent="InventoryPanel/Margin/VBox"]
+theme_override_font_sizes/font_size = 20
+text = "INVENTORY"
+
+[node name="Hint" type="Label" parent="InventoryPanel/Margin/VBox"]
+text = "Resources & Equipment  •  Press I to close"
+
+[node name="InventoryGrid" type="GridContainer" parent="InventoryPanel/Margin/VBox"]
+unique_name_in_owner = true
+columns = 3
