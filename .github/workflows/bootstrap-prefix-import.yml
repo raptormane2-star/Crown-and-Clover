@@ -1,0 +1,148 @@
+name: Import playable v0.3 reference
+
+on:
+  push:
+    branches:
+      - bootstrap/v03-import
+    paths:
+      - .bootstrap/IMPORT_PREFIX_READY
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bootstrap branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Recover completed files from valid archive prefix
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            cat .bootstrap/chunk-000 .bootstrap/chunk-001 .bootstrap/chunk-002
+            head -c 16000 .bootstrap/chunk-003
+            cat .bootstrap/chunk-004 .bootstrap/chunk-005 .bootstrap/chunk-006
+          } > /tmp/prefix.b64
+          base64 --decode /tmp/prefix.b64 > /tmp/prefix.tar.gz
+          python3 - <<'PY'
+          import zlib
+          from pathlib import Path
+
+          raw = Path('/tmp/prefix.tar.gz').read_bytes()
+          decomp = zlib.decompressobj(16 + zlib.MAX_WBITS)
+          try:
+              tar_data = decomp.decompress(raw)
+          except zlib.error:
+              tar_data = b''
+              decomp = zlib.decompressobj(16 + zlib.MAX_WBITS)
+              for offset in range(0, len(raw), 4096):
+                  try:
+                      tar_data += decomp.decompress(raw[offset:offset + 4096])
+                  except zlib.error:
+                      break
+
+          out = Path('/tmp/recovered')
+          out.mkdir(parents=True, exist_ok=True)
+          pos = 0
+          while pos + 512 <= len(tar_data):
+              header = tar_data[pos:pos + 512]
+              if header == b'\0' * 512:
+                  break
+              name = header[:100].split(b'\0', 1)[0].decode('utf-8', 'replace')
+              if not name:
+                  break
+              size_field = header[124:136].split(b'\0', 1)[0].strip() or b'0'
+              try:
+                  size = int(size_field, 8)
+              except ValueError:
+                  break
+              start = pos + 512
+              end = start + size
+              if end > len(tar_data):
+                  break
+              typeflag = header[156:157]
+              if typeflag in (b'0', b'\0'):
+                  target = out / name
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(tar_data[start:end])
+              pos = start + ((size + 511) // 512) * 512
+          PY
+
+      - name: Validate required real pixel-art assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            assets/cute/grass.png
+            assets/cute/path.png
+            assets/cute/water.png
+            assets/cute/farmland.png
+            assets/cute/house_blue.png
+            assets/cute/tree.png
+            assets/cute/chest.png
+            assets/cute/slime_sheet.png
+            assets/cute/skeleton_sheet.png
+            assets/farm/character/player_idle.png
+            assets/farm/animals/chicken.png
+            assets/farm/animals/cow.png
+            assets/farm/crops/spring_crops.png
+          )
+          for file in "${required[@]}"; do
+            test -s "/tmp/recovered/$file" || { echo "Missing recovered runtime asset: $file"; exit 1; }
+          done
+
+      - name: Build clean playable main baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .bootstrap/baseline/project.godot /tmp/project.godot
+          cp .bootstrap/baseline/main.tscn /tmp/main.tscn
+          cp .bootstrap/baseline/main.gd /tmp/main.gd
+          git checkout main
+          rm -rf assets game audio docs licenses main.gd main.tscn project.godot
+          mkdir -p assets
+          cp -R /tmp/recovered/assets/. assets/
+          cp /tmp/project.godot project.godot
+          cp /tmp/main.tscn main.tscn
+          cp /tmp/main.gd main.gd
+          cat > README.md <<'EOF'
+          # Crown & Clover
+
+          Crown & Clover is a cozy top-down pixel-art kingdom-building exploration RPG built with Godot 4.
+
+          This `main` branch keeps the playable v0.3 Kingdom Life reference baseline. Active foundation refactoring happens on `dev/v0.4-foundation` so `main` stays a stable comparison point.
+
+          Core loop: **gather → build → explore → fight → expand → rule**.
+
+          ## Controls
+          - WASD / Arrow keys — move
+          - E — gather, fight, talk, interact
+          - B — build selected structure
+          - 1 / 2 / 3 — House / Farm / Smithy
+          - F5 — save
+          - F6 — load
+
+          In-game text is English. Pixel-art filtering is configured to nearest-neighbor.
+          EOF
+          cat > CHANGELOG.md <<'EOF'
+          # Changelog
+
+          ## [Unreleased]
+          - v0.4 Foundation refactor in progress on `dev/v0.4-foundation`.
+
+          ## [0.3.0] - Kingdom Life
+          - Playable top-down overworld reference.
+          - Gathering, building, villagers/jobs representation, animals, crops and enemies.
+          - Bramblefall Ruins, Mossdeep Cave, Alderwatch and treasure landmarks.
+          - Basic inventory/resource state, day/night and save/load.
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "feat: import playable v0.3 Kingdom Life baseline"
+          git push origin main
