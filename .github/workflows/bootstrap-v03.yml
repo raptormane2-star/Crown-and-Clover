@@ -1,0 +1,41 @@
+name: Bootstrap v0.3 import
+
+on:
+  push:
+    branches:
+      - bootstrap/v03-import
+    paths:
+      - .bootstrap/READY
+
+permissions:
+  contents: write
+
+jobs:
+  import-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bootstrap branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebuild project archive
+        shell: bash
+        run: |
+          cat .bootstrap/chunk-* | base64 --decode > /tmp/crown-and-clover.tar.gz
+          mkdir -p /tmp/crown-and-clover
+          tar -xzf /tmp/crown-and-clover.tar.gz -C /tmp/crown-and-clover
+
+      - name: Commit playable v0.3 baseline to main
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B main origin/main
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/crown-and-clover/. .
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: import v0.3 Kingdom Life project baseline"
+          git push origin main
