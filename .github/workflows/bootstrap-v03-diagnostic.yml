@@ -1,0 +1,83 @@
+name: Bootstrap archive diagnostics
+
+on:
+  push:
+    branches:
+      - bootstrap/v03-import
+    paths:
+      - .bootstrap/DIAG
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bootstrap branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate staged archive and write status
+        shell: bash
+        run: |
+          set +e
+          STATUS=.bootstrap/STATUS
+          : > "$STATUS"
+          echo "Crown & Clover bootstrap archive diagnostic" >> "$STATUS"
+          echo "commit=$(git rev-parse HEAD)" >> "$STATUS"
+          echo >> "$STATUS"
+          for f in .bootstrap/chunk-*; do
+            [ -f "$f" ] || continue
+            printf '%s bytes=' "$f" >> "$STATUS"
+            wc -c < "$f" | tr -d ' ' >> "$STATUS"
+            printf ' head=' >> "$STATUS"
+            head -c 24 "$f" >> "$STATUS"
+            printf ' tail=' >> "$STATUS"
+            tail -c 24 "$f" >> "$STATUS"
+            echo >> "$STATUS"
+          done
+          cat .bootstrap/chunk-* > /tmp/crown-and-clover.b64
+          echo >> "$STATUS"
+          printf 'combined_base64_bytes=' >> "$STATUS"
+          wc -c < /tmp/crown-and-clover.b64 | tr -d ' ' >> "$STATUS"
+          echo >> "$STATUS"
+          printf 'combined_base64_sha256=' >> "$STATUS"
+          sha256sum /tmp/crown-and-clover.b64 | cut -d' ' -f1 >> "$STATUS"
+          if base64 --decode /tmp/crown-and-clover.b64 > /tmp/crown-and-clover.tar.gz 2>/tmp/base64.err; then
+            echo 'base64_decode=ok' >> "$STATUS"
+            printf 'decoded_bytes=' >> "$STATUS"
+            wc -c < /tmp/crown-and-clover.tar.gz | tr -d ' ' >> "$STATUS"
+            echo >> "$STATUS"
+            printf 'decoded_sha256=' >> "$STATUS"
+            sha256sum /tmp/crown-and-clover.tar.gz | cut -d' ' -f1 >> "$STATUS"
+            if gzip -t /tmp/crown-and-clover.tar.gz 2>/tmp/gzip.err; then
+              echo 'gzip_test=ok' >> "$STATUS"
+              if tar -tzf /tmp/crown-and-clover.tar.gz >/tmp/tar.list 2>/tmp/tar.err; then
+                echo 'tar_list=ok' >> "$STATUS"
+                printf 'tar_files=' >> "$STATUS"
+                wc -l < /tmp/tar.list | tr -d ' ' >> "$STATUS"
+                echo >> "$STATUS"
+              else
+                echo 'tar_list=failed' >> "$STATUS"
+                cat /tmp/tar.err >> "$STATUS"
+              fi
+            else
+              echo 'gzip_test=failed' >> "$STATUS"
+              cat /tmp/gzip.err >> "$STATUS"
+            fi
+          else
+            echo 'base64_decode=failed' >> "$STATUS"
+            cat /tmp/base64.err >> "$STATUS"
+          fi
+
+      - name: Commit diagnostic status
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .bootstrap/STATUS
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: report bootstrap archive status"
+          git push origin HEAD:bootstrap/v03-import
