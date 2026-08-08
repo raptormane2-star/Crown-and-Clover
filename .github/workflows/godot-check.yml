@@ -1,0 +1,19 @@
+name: Godot Project Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Godot
+        uses: solarlabyrinth/action-setup-godot@v3
+        with:
+          version: 4.7.1-stable
+          export-templates: false
+      - name: Import project and check scripts
+        run: godot --headless --editor --path game --quit
