@@ -25,6 +25,7 @@ build_house={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":72
 build_farm={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":70)]}
 build_smithy={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":75)]}
 save_game={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":4194309)]}
+load_game={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":76)]}
 inventory={"deadzone":0.5,"events":[Object(InputEventKey,"physical_keycode":73),Object(InputEventKey,"physical_keycode":4194308)]}
 hotbar_next={"deadzone":0.5,"events":[Object(InputEventMouseButton,"button_index":5)]}
 hotbar_previous={"deadzone":0.5,"events":[Object(InputEventMouseButton,"button_index":4)]}
